@@ -1,34 +1,38 @@
 -- Accidental Noise Library
--- premake4.lua
+-- premake5.lua
 
 local usethread=true 
 
-solution "ANL"
-	configurations {"Debug", "Release", "ReleaseWithSymbols"}
-	platforms {"Native", "x32", "x64", "Universal"}
+workspace "ANL"
+	configurations {"Debug", "Release"}
+	platforms {"x32", "x64", "Universal"}
 	location "build"
 	
 	if usethread then defines { "USETHREAD" } end
 	
-	configuration "Debug"
+	filter "configurations:Debug"
 		defines { "DEBUG" }
-		flags { "Symbols" }
+		flags "Symbols"
+		optimize "Off"
 
-	configuration "Release"
+	filter "configurations:Release"
 		defines { "NDEBUG" }
-		flags { "Optimize" }
+		optimize "Speed"
 		
-  configuration "Release"
-		defines { "NDEBUG" }
-		flags { "Optimize", "Symbols" }
-		
-	configuration {}
+	filter "platforms:x32"
+    targetdir "build/ANL/x86"
+    
+  filter "platforms:x64"
+    targetdir "build/ANL/x64"
+    
+  filter "platforms:Universal"
+    targetdir "build/ANL/Universal"
 	
-	project "ANLLib"
+	project "ANL"
 		kind "StaticLib"
 		location "build/ANL"
-		targetdir "build/ANL"
 		language "C++"
+		vectorextensions "SSE2"
 		if _ACTION=="gmake" then
 			buildoptions "-std=c++11"
 		end
